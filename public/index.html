@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PNG to SVG Converter</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f0f0f0; }
+    input, button { padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h2>Upload PNG(s) to Convert to SVG</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="images" accept="image/png" multiple required />
+    <button type="submit">Convert</button>
+  </form>
+
+  <div id="results"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const results = document.getElementById('results');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      results.innerHTML = 'Processing...';
+
+      const formData = new FormData(form);
+      const res = await fetch('/convert', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      results.innerHTML = data.map(d =>
+        d.svg ? `<p>${d.original}: <a href="${d.svg}" target="_blank">Download SVG</a></p>` :
+                `<p>${d.original}: ❌ ${d.error}</p>`
+      ).join('');
+    });
+  </script>
+</body>
+</html>
